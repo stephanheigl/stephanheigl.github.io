@@ -1,25 +1,35 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>A blog - on nothing of importance</title>
+    <title>A blog</title>
     <link>https://stephanheigl.github.io/</link>
-    <description>Recent content on A blog - on nothing of importance</description>
+    <description>Recent content on A blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 20 Apr 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 07 May 2019 22:06:53 +0200</lastBuildDate>
     
 	<atom:link href="https://stephanheigl.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>Cross-Platform Shader Handling</title>
+      <link>https://stephanheigl.github.io/posts/shader-compiler/</link>
+      <pubDate>Tue, 07 May 2019 22:06:53 +0200</pubDate>
+      
+      <guid>https://stephanheigl.github.io/posts/shader-compiler/</guid>
+      <description>When targeting all major mobile platforms and windows with a tiny team, writing all shaders for OpenGL ES3.x, D3D11 and Metal is a time consuming and error prone task. A desirable goal is to write shaders once and cross-compile or translate them for all target platforms. This article gives an overview over our current approach.
+Windows is my primary development platform, therefore shaders are written in HLSL for D3D11 first.</description>
+    </item>
+    
+    <item>
       <title>About</title>
       <link>https://stephanheigl.github.io/about/</link>
-      <pubDate>Sat, 20 Apr 2019 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://stephanheigl.github.io/about/</guid>
-      <description>Stephan Heigl A systems programmer and generalist
+      <description>Stephan Heigl South Germany Contact: @stephanheigl
 Job experience 2006 - present Software Engineer at Bosch Security Systems / Building Technologies
-Mostly cross-platform application development for desktop and mobile platforms in video surveillance context, prototyping/research/mentoring.
+Building cross-platform frameworks &amp;amp; applications for desktop and mobile platforms in video surveillance context, internal tooling, prototyping/research/mentoring.
 2011 onwards Development of custom cross-platform toolkits tailored to video systems requirements along with application using aforementioned toolkits.
 Among other things, I worked on:
  Graphics Engine/Renderer with support for OpenGL ES/D3D11/Metal Shader System with custom shader compiler/translator, shader description language and tooling for vscode.</description>
