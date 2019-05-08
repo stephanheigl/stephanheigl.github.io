@@ -455,7 +455,9 @@ graph TD;
 <p>Currently only Visual Studio and VSCode provide extension points for syntax highlighting. Visual Studio supports TextMaker <code>.tmLanguage</code> files out of the box. It isn&rsquo;t even necessary to write an extension/add-on. All it takes is placing the <code>*.tmLanguage</code> files in <code>%USERPROFILE%\.vs\Extensions\Shaderlib\*</code></p>
 
 <p>The official HJSON site provides a <a href="https://github.com/hjson/textmate-hjson/tree/master/Syntaxes">HJSON.tmLanguage</a>. To get embedded HLSL highlighting within multi-line code strings, the <a href="https://github.com/stef-levesque/vscode-extensions/blob/master/extensions/shader/syntaxes/hlsl.tmLanguage">HLSL.tmLanguage</a> from VSCode is used and activated within mutli-line string sections.</p>
-<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml">	<span style="color:#f92672">&lt;key&gt;</span>mstring<span style="color:#f92672">&lt;/key&gt;</span>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml">    ....
+	<span style="color:#75715e">&lt;!-- modify mstring rule.. --&gt;</span>
+	<span style="color:#f92672">&lt;key&gt;</span>mstring<span style="color:#f92672">&lt;/key&gt;</span>
       <span style="color:#f92672">&lt;dict&gt;</span>
         <span style="color:#f92672">&lt;key&gt;</span>begin<span style="color:#f92672">&lt;/key&gt;</span>
         <span style="color:#f92672">&lt;string&gt;</span>&#39;&#39;&#39;<span style="color:#f92672">&lt;/string&gt;</span>
