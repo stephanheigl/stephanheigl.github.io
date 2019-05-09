@@ -6,20 +6,9 @@
     <description>Recent content on A blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 07 May 2019 22:06:53 +0200</lastBuildDate>
     
 	<atom:link href="https://stephanheigl.github.io/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>Cross-Platform Shader Handling</title>
-      <link>https://stephanheigl.github.io/posts/shader-compiler/</link>
-      <pubDate>Tue, 07 May 2019 22:06:53 +0200</pubDate>
-      
-      <guid>https://stephanheigl.github.io/posts/shader-compiler/</guid>
-      <description>When targeting all major mobile platforms and windows with a tiny team, writing all shaders for OpenGL ES3.x, D3D11 and Metal is a time consuming and error prone task. A desirable goal is to write shaders once and cross-compile or translate them for all target platforms. This article gives an overview over our current approach.
-Windows is my primary development platform, therefore shaders are written in HLSL for D3D11 first.</description>
-    </item>
     
     <item>
       <title>About</title>
