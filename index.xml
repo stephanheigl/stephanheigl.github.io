@@ -38,7 +38,7 @@ Windows being the primary development platform, therefore shaders are written in
       <guid>https://stephanheigl.github.io/about/</guid>
       <description>Stephan Heigl South Germany Contact: @stephanheigl
 Job experience 2006 - present Software Engineer at Bosch Security Systems / Building Technologies
-Building cross-platform frameworks &amp;amp; applications for desktop and mobile platforms in video surveillance context, internal tooling, prototyping/research/mentoring.
+Building platform &amp;amp; applications for desktop and mobile devices in video surveillance context, internal tooling, prototyping/research/mentoring.
 2011 onwards Development of custom cross-platform toolkits tailored to video systems requirements along with application using aforementioned toolkits.
 Among other things, I worked on:
  Graphics Engine/Renderer with support for OpenGL ES/D3D11/Metal Shader System with custom shader compiler/translator, shader description language and tooling for vscode. SPIR-V based. AR/VR support and prototypes for ARKit and Hololens, fusion of AR with BIM/sensor data OpenGL ES3 based video processing pipeline for smart cameras (embedded) Memory Management Premake-based build system, generators for Visual Studio MDD and xcode, asset file handling, localization Platform support for iOS, Android, Windows: I/O, audio, rendering, networking, cryptography, event handling.. Video streaming: network protocols, bitstream parsing (H.</description>
