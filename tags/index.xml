@@ -6,9 +6,28 @@
     <description>Recent content in Tags on A blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <lastBuildDate>Thu, 09 May 2019 22:06:53 +0200</lastBuildDate>
     
 	<atom:link href="https://stephanheigl.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>coding</title>
+      <link>https://stephanheigl.github.io/tags/coding/</link>
+      <pubDate>Thu, 09 May 2019 22:06:53 +0200</pubDate>
+      
+      <guid>https://stephanheigl.github.io/tags/coding/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>gamedev</title>
+      <link>https://stephanheigl.github.io/tags/gamedev/</link>
+      <pubDate>Thu, 09 May 2019 22:06:53 +0200</pubDate>
+      
+      <guid>https://stephanheigl.github.io/tags/gamedev/</guid>
+      <description></description>
+    </item>
     
   </channel>
 </rss>

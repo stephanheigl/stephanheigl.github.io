@@ -4,6 +4,36 @@
   
   <url>
     <loc>https://stephanheigl.github.io/</loc>
+    <lastmod>2019-05-09T22:06:53+02:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://stephanheigl.github.io/posts/shader-compiler/</loc>
+    <lastmod>2019-05-09T22:06:53+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://stephanheigl.github.io/posts/</loc>
+    <lastmod>2019-05-09T22:06:53+02:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://stephanheigl.github.io/tags/</loc>
+    <lastmod>2019-05-09T22:06:53+02:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://stephanheigl.github.io/tags/coding/</loc>
+    <lastmod>2019-05-09T22:06:53+02:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://stephanheigl.github.io/tags/gamedev/</loc>
+    <lastmod>2019-05-09T22:06:53+02:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -13,11 +43,6 @@
   
   <url>
     <loc>https://stephanheigl.github.io/categories/</loc>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://stephanheigl.github.io/tags/</loc>
     <priority>0</priority>
   </url>
   

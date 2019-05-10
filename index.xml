@@ -6,9 +6,29 @@
     <description>Recent content on A blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <lastBuildDate>Thu, 09 May 2019 22:06:53 +0200</lastBuildDate>
     
 	<atom:link href="https://stephanheigl.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Cross-Platform Shader Handling</title>
+      <link>https://stephanheigl.github.io/posts/shader-compiler/</link>
+      <pubDate>Thu, 09 May 2019 22:06:53 +0200</pubDate>
+      
+      <guid>https://stephanheigl.github.io/posts/shader-compiler/</guid>
+      <description>&lt;p&gt;When targeting all major mobile platforms and windows with a tiny team, writing all shaders for OpenGL ES3.x, D3D11 and Metal is a time consuming and error prone task. A desirable goal is to write shaders once and cross-compile or translate them for all target platforms.
+Windows being the primary development platform, therefore shaders are written in HLSL first. Unfortunately there&amp;rsquo;s not just pure HLSL code - there&amp;rsquo;s also quite a bunch of state associated with shaders.&lt;/p&gt;
+
+&lt;p&gt;This article gives an overview over our current approach.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Shader libraries&lt;/li&gt;
+&lt;li&gt;Code generation&lt;/li&gt;
+&lt;li&gt;Translation and compilation&lt;/li&gt;
+&lt;li&gt;Tooling&lt;/li&gt;
+&lt;/ul&gt;</description>
+    </item>
     
     <item>
       <title>About</title>
@@ -21,7 +41,7 @@ Job experience 2006 - present Software Engineer at Bosch Security Systems / Buil
 Building cross-platform frameworks &amp;amp; applications for desktop and mobile platforms in video surveillance context, internal tooling, prototyping/research/mentoring.
 2011 onwards Development of custom cross-platform toolkits tailored to video systems requirements along with application using aforementioned toolkits.
 Among other things, I worked on:
- Graphics Engine/Renderer with support for OpenGL ES/D3D11/Metal Shader System with custom shader compiler/translator, shader description language and tooling for vscode.</description>
+ Graphics Engine/Renderer with support for OpenGL ES/D3D11/Metal Shader System with custom shader compiler/translator, shader description language and tooling for vscode. SPIR-V based. AR/VR support and prototypes for ARKit and Hololens, fusion of AR with BIM/sensor data OpenGL ES3 based video processing pipeline for smart cameras (embedded) Memory Management Premake-based build system, generators for Visual Studio MDD and xcode, asset file handling, localization Platform support for iOS, Android, Windows: I/O, audio, rendering, networking, cryptography, event handling.. Video streaming: network protocols, bitstream parsing (H.</description>
     </item>
     
   </channel>

@@ -77,8 +77,8 @@
             
             <div class="c-time">
                 Posted on
-                <time datetime=" 2019-05-07T22:06:53&#43;02:00 ">
-          May 7, 2019
+                <time datetime=" 2019-05-09T22:06:53&#43;02:00 ">
+          May 9, 2019
         </time>
             </div>
              
@@ -88,18 +88,22 @@
     </header>
     
     <section id="js-article" class="p-article__body">
-        
+        <p>When targeting all major mobile platforms and windows with a tiny team, writing all shaders for OpenGL ES3.x, D3D11 and Metal is a time consuming and error prone task. A desirable goal is to write shaders once and cross-compile or translate them for all target platforms.
+Windows being the primary development platform, therefore shaders are written in HLSL first. Unfortunately there&rsquo;s not just pure HLSL code - there&rsquo;s also quite a bunch of state associated with shaders.</p>
 
-<p>When targeting all major mobile platforms and windows with a tiny team, writing all shaders for OpenGL ES3.x, D3D11 and Metal is a time consuming and error prone task. A desirable goal is to write shaders once and cross-compile or translate them for all target platforms. This article gives an overview over our current approach.</p>
+<p>This article gives an overview over our current approach.</p>
 
-<p>Windows is my primary development platform, therefore shaders are written in HLSL for D3D11 first. This is mostly due tooling - Visual Studio IDE, CPU and GPU debugger are quite good compared to the offerings on iOS and Android. Unfortunately there&rsquo;s not just pure HLSL code - there&rsquo;s also quite a bunch of state associated with shaders.</p>
+<ul>
+<li>Shader libraries</li>
+<li>Code generation</li>
+<li>Translation and compilation</li>
+<li>Tooling</li>
+</ul>
 
 <h2 id="terminology">Terminology</h2>
 
 <p>The term <strong>shader</strong> has alot of different meanings in computer graphics. At the lowest level it is used for shader binaries or functions running on GPUs for vertex, pixel, geometry shader stages or compute jobs.
 At the next level the term is used for shader for render (pipeline) state linked with shader functions and so on.</p>
-
-<p>Nathan Reed has a nice article on this topic - <a href="http://reedbeta.com/blog/many-meanings-of-shader/">The Many Meanings of Shader</a>.</p>
 
 <p>In this context the following terminology is used:</p>
 
@@ -107,7 +111,7 @@ At the next level the term is used for shader for render (pipeline) state linked
 <dt><strong>stage</strong></dt>
 <dd>is the lowest building block. It&rsquo;s the shader binary/function as used in the graphics APIs. One function per pipeline stage (i.e. vertex,fragment,geometry,compute)</dd>
 <dt><strong>technique</strong></dt>
-<dd>links shader functions/stages with render pipeline state</dd>
+<dd>links shader functions/stages with render state</dd>
 <dt><strong>shader</strong></dt>
 <dd>is a collection of techniques</dd>
 <dt><strong>shaderlib</strong></dt>
@@ -118,7 +122,7 @@ At the next level the term is used for shader for render (pipeline) state linked
 
 <p>As mentioned above - shaders are not only pure HLSL/GLSL/MSL code but also require some additional render state.
 The purpose of <strong>shaderlib files</strong> is to define collections of shaders which are translated and or compiled to platform specific shader binaries and render state.
-The goal is to provide enough metadata for the render system to feed them with data and setup what is usually called render pipeline state in modern GPU APIs (DX12,Metal,Vk).</p>
+The goal is to provide enough metadata for the render system to feed them with data and setup what is usually called <strong>render pipeline state</strong> in modern GPU APIs (DX12,Metal,Vk).</p>
 
 <p>Shaderlibs are built from the following components:</p>
 
@@ -246,10 +250,13 @@ graph TD;
 
 }</code></pre></div>
 
-<p>It&rsquo;s the second version of the system, the first one was based on a DSL (domain specific language) using LUA. This was nice in theory, i.e. use a scripting language to generate shader variations with full flexibility.
-In practice this was overkill and never needed. Plus - error reporting was bad and often required printf debugging or attaching a full LUA debugger to the shader lib tool just to find out what&rsquo;s wrong. The HJSON syntax together with reuseable, named building blocks is convenient enough to write shaders and the actual implementation of the parser is by far simpler.</p>
+<p>As outline in the diagram above, shader libraries contain a collection of shaders which contain a number of techniques. We generate a runtime render pipeline state for every <code>Technique</code> of a shader.</p>
 
-<h2 id="code-generation">Code Generation</h2>
+<p>Constant/uniform buffer layout is not defined directly in shader code but explicitly via <code>ParamBlocks</code>. Code generator then generates the cbuffer/uniform buffer layouts out of this ensuring consistent padding and alignment. Another option would be to use shader reflection but this would require separate implementations for every target bytecode format (min. DX and SPIR-V).</p>
+
+<p>Same applies to <code>VertexLayout</code> and shader stage inputs and outputs. Every stage defines <code>Exports</code> which are then used as input for the next stage in the graphics pipeline.</p>
+
+<h2 id="code-generation-shaderlib-to-hlsl">Code Generation: Shaderlib to HLSL</h2>
 
 <p>Shaderlibs are processed using the <strong>Shader Compiler</strong> command-line tool which generates the actual shader in the target platform&rsquo;s byte- or source code format along with all render state in a proprietary binary format.</p>
 
@@ -418,21 +425,21 @@ not have an intermediate or binary format the compiler step is a verification st
 <div class="mermaid" align="left" >
 graph TD;
     shlb(Shaderlib Binary)
-
+	spv(SPIR-V)
 	SL(.shaderlib) --> Parser
     Parser --> IL(Intermediate Representation)
     IL --> Generator
-    Generator --> HLSL 
-    HLSL --> fxc[D3D HLSL Compiler]
+    Generator --> hlsl(HLSL)
+    hlsl --> fxc[D3D HLSL Compiler]
     fxc -->  shlb
 	Generator --> glslc[Khronos GLSL Reference Compiler] 
-    glslc --> SPIR-V 
-    SPIR-V --> spvx[SPIR-V Cross]
-	spvx --> GLSL
-    GLSL  --> glslv[Khronos GLSL Validator] 
+    glslc --> spv
+    spv --> spvx[SPIR-V Cross]
+	spvx --> glsl(GLSL)
+    glsl  --> glslv[Khronos GLSL Validator] 
     glslv --> shlb
-	spvx --> MetalSL
-    MetalSL --> mtlc[MetalSL Compiler] 
+	spvx --> msl(MetalSL)
+    msl --> mtlc[MetalSL Compiler] 
     mtlc --> shlb
 </div>
 
@@ -488,6 +495,8 @@ graph TD;
         <span style="color:#f92672">&lt;key&gt;</span>name<span style="color:#f92672">&lt;/key&gt;</span>
         <span style="color:#f92672">&lt;string&gt;</span>string.quoted.multiline.shaderlib<span style="color:#f92672">&lt;/string&gt;</span>
       <span style="color:#f92672">&lt;/dict&gt;</span></code></pre></div>
+<p><strong>Visual Studio Code</strong> provides a rich extension API. Information on how to add custom syntax highlighting can be found in the <a href="https://code.visualstudio.com/api/language-extensions/syntax-highlight-guide">VSCode documentation</a>.</p>
+
 <!-- 
 ## TODO
 - Tooling
@@ -497,13 +506,17 @@ graph TD;
       - strip out for GLSL, while ref compiler supports it..some android drivers don't..or complain about the preprocessor statement and dont support the necesseary extension GOOGLE_line ..bla
 -->
 
-<h2 id="references">References</h2>
+<h2 id="wrap-up">Wrap up</h2>
+
+<p>The pipeline outlined in this post has served us well for a year now and was suprisingly straightforward to build. This is largely due to the excellent <strong>SPIR-V Cross</strong> project.</p>
+
+<p>There are also some more generic solutions out there which are also based on SPIR-V providing similar or better functionality.</p>
 
 <ul>
-<li><a href="http://reedbeta.com/blog/many-meanings-of-shader/">Nathan Reed - The Many Meanings of Shader</a></li>
-<li><a href="https://ourmachinery.com/post/the-machinery-shader-system-part-2/">Our Machinery Blog - The Machinery Shader System Part 2</a></li>
+<li><a href="https://github.com/google/shaderc">Google shaderc</a></li>
+<li><a href="https://github.com/Microsoft/ShaderConductor">Microsoft Shader Conductor</a> - based on DXC</li>
+<li><a href="https://github.com/floooh/sokol-tools">sokol_gfx shader cross-compiler</a> - currently in development</li>
 </ul>
-
     </section>
     <footer>
         
