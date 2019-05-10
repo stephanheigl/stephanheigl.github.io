@@ -1130,6 +1130,7 @@ img {
 
 img[src$='#clip-ellipse'] {
     clip-path: ellipse(50% 50% at 50% 50%);
+    -webkit-clip-path: ellipse(50% 50% at 50% 50%);
     float: right;
     /* OLD VALUE example: ellipse(245px, 80px, 75px, 30px); */
 }
