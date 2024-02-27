@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Connect Primitive Test</title>
+	<script type="module">
+		import * as rcplib from './rcplib.esm.js';
+
+		let client = null;
+
+		const connect = async () => {
+			const ip = document.querySelector('#txtIP').value;
+			client = new rcplib.RCPClientBinaryWSDOM();
+			await client.connect(ip, 80);
+			const reg = await client.register({
+				username: "service",
+				password: "",
+				messages: [0xff0d],
+				messagecallback: (a) => { console.log('message: ', a) }
+			});
+			console.log("websocket registered: ", reg);
+			// client = new rcplib.RCPClientXMLDOM({rcpurl: `http://${ip}/rcp.xml`});
+			const data = {
+				items: [
+					{
+						method: rcplib.CONNECT_PRIMITIVE_METHOD.GET,
+						media: rcplib.CONNECT_PRIMITIVE_MEDIA.VIDEO,
+						headerflags: 0,
+						descriptors: [
+							{
+								flags: rcplib.CONNECT_PRIMITIVE_FLAGS.RELATIVE_ADDRESSING,
+								coder: 1,
+								line: 1,
+								coding: rcplib.CONNECT_PRIMITIVE_VIDEO_CODING.H264,
+							},
+						],
+					},
+				],
+			};
+			const res = await client.writeRCP(rcplib.CONF_CONNECT_PRIMITIVE, 1, data);
+
+			// open the websocket
+			const strSessionid = res.sessionid.toString(16).padStart(8, '0');
+			const strMediatype = "01"; //01: video, 02: audio
+			const strDirection = "01"; //01: receive, 00: transmit
+			const strLine = res.result.parsed.items[0].descriptors[0].line.toString(16).padStart(2, '0');
+			const strCoder = res.result.parsed.items[0].descriptors[0].coder.toString(16).padStart(2, '0'); //relative coder nbr
+
+			const url = `ws://${ip}/websocket/media_tunnel/${strSessionid}/${strMediatype}/${strDirection}/${strLine}/${strCoder}?index=1`;
+			openWebsocket(url);
+		}
+
+		const openWebsocket = (url) => {
+			try {
+				let socket = new WebSocket(url, 'rcpplus');
+				socket.addEventListener("open", (evt) => {
+					console.log('socket opened', evt);
+				});
+				socket.addEventListener("close", (evt) => {
+					console.log('socket closed', evt);
+				});
+				socket.addEventListener("error", (error) => {
+					console.log('socket error: ', error);
+				});
+				socket.addEventListener("message", async (msg) => {
+					const a = new Uint8Array(await msg.data.arrayBuffer());
+					console.log('socket msg: ', toHexString(a));
+				});
+			} catch (e) {
+				console.error("error opening websocket: ", e)
+			}
+		}
+
+		const disconnect = async () => {
+			if (client) {
+				const res = await client.writeRCP(rcplib.CONF_DISCONNECT_PRIMITIVE_P_OCTET, 1, {});
+				console.log(res);
+				client.destroy();
+			}
+		}
+
+		const toHexString = (a) => {
+			return Array.from(a).map((b) => b.toString(16).padStart(2, "0")).join(" ")
+		}
+
+		window.connect = connect;
+		window.disconnect = disconnect;
+	</script>
+</head>
+<body>
+	<h3>Connect Primitive Test</h3>
+	<div style="margin-bottom: 1rem">
+		<label for="txtIP">IP:</label>
+		<input id="txtIP" type="text" placeholder="127.0.0.1" value="10.30.28.124" />
+	</div>
+	<button onclick="connect()">Connect</button>
+	<button onclick="disconnect()">Disconnect</button>
+</body>
+</html>
