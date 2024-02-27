@@ -74,7 +74,7 @@
 		const connect = async () => {
 			const ip = document.querySelector('#txtIP').value;
 			client = new rcplib.RCPClientBinaryWSDOM();
-			await client.connect(ip, 80);
+			await client.connect(ip, 443);
 			const reg = await client.register({
 				username: "service",
 				password: "",
@@ -109,7 +109,7 @@
 			const strLine = res.result.parsed.items[0].descriptors[0].line.toString(16).padStart(2, '0');
 			const strCoder = res.result.parsed.items[0].descriptors[0].coder.toString(16).padStart(2, '0'); //relative coder nbr
 
-			const url = `ws://${ip}/websocket/media_tunnel/${strSessionid}/${strMediatype}/${strDirection}/${strLine}/${strCoder}?index=1`;
+			const url = `wss://${ip}/websocket/media_tunnel/${strSessionid}/${strMediatype}/${strDirection}/${strLine}/${strCoder}?index=1`;
 			openWebsocket(url);
 			keepAliveSession();
 		}
