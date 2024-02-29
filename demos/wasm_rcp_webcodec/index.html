@@ -1,0 +1,218 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+	<meta charset="UTF-8" />
+	<title>Video Decode</title>
+</head>
+
+<body style="background: white">
+		<h3>Demo: RCP+, WASM and WebCodec</h3>
+	<div style="margin-bottom: 1rem">
+		<label for="txtIP">IP:</label>
+		<input id="txtIP" type="text" placeholder="127.0.0.1" value="192.168.178.75" />
+		<button onclick="connect()">Connect</button>
+		<button onclick="disconnect()">Disconnect</button>
+		<textarea id="rule_script" style="width: 100%; height: 200px">
+//@Task T:1 V:0 I:1 "Detect moving objects" {
+//[4.a=c:1;2.a=(m:1);]
+ObjectState #32 := true;
+external ObjectState #1 :=  ObjectState #32;
+external Event #1 := OnSet ObjectState #1;
+//@}</textarea>
+		<button onclick="window.rule_engine.configure(document.querySelector('#rule_script').value)">Set Rule Script</button>
+	</div>
+	<canvas class="game" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+	<div id="ruleengine_log"></div>
+
+	<script type="text/javascript">
+	var Module = {
+		preRun: [],
+		postRun: [],
+		print: (function () {
+			return function (text) {
+				text = Array.prototype.slice.call(arguments).join(' ');
+				console.log(text);
+			};
+		})(),
+		printErr: function (text) {
+			text = Array.prototype.slice.call(arguments).join(' ');
+			console.error(text);
+		},
+		canvas: (function () {
+			var canvas = document.getElementById('canvas');
+			canvas.addEventListener("webglcontextlost", function (e) { alert('FIXME: WebGL context lost, please reload the page'); e.preventDefault(); }, false);
+			return canvas;
+		})(),
+		setStatus: function (text) { },
+		monitorRunDependencies: function (left) { },
+
+		onRuntimeInitialized: function () {
+			// console.log('lerp result: ' + Module.lerp(1, 2, 0.5));
+			var decoder = new Module.VideoDecoder('canvas');
+			this.video_decoder = decoder;
+			window.video_decoder = decoder;
+
+			var rule_engine = new Module.RuleEngine();
+			this.rule_engine = rule_engine;
+			window.rule_engine = rule_engine;
+		}
+
+	};
+	window.onerror = function (event) {
+		console.log("onerror: " + event.message);
+	};
+	</script>
+	<!-- Load emscripten module -->
+	<script type="module">
+		import * as rcplib from './rcplib.esm.js';
+
+		let client = null;
+
+		const connect = async () => {
+			const ip = document.querySelector('#txtIP').value;
+			client = new rcplib.RCPClientBinaryWSDOM();
+			await client.connect(ip, 443);
+			const reg = await client.register({
+				username: "service",
+				password: "",
+				messages: [0xff0d],
+				messagecallback: (a) => { console.log('message: ', a) }
+			});
+			console.log("websocket registered: ", reg);
+			// client = new rcplib.RCPClientXMLDOM({rcpurl: `http://${ip}/rcp.xml`});
+			const data = {
+				items: [
+					{
+						method: rcplib.CONNECT_PRIMITIVE_METHOD.GET,
+						media: rcplib.CONNECT_PRIMITIVE_MEDIA.VIDEO,
+						headerflags: 0,
+						descriptors: [
+							{
+								flags: rcplib.CONNECT_PRIMITIVE_FLAGS.RELATIVE_ADDRESSING,
+								coder: 1,
+								line: 1,
+								coding: rcplib.CONNECT_PRIMITIVE_VIDEO_CODING.H264,
+							},
+						],
+					},
+					{
+						method: rcplib.CONNECT_PRIMITIVE_METHOD.GET,
+						media: rcplib.CONNECT_PRIMITIVE_MEDIA.VIDEO,
+						headerflags: 0,
+						descriptors: [
+							{
+								flags: rcplib.CONNECT_PRIMITIVE_FLAGS.RELATIVE_ADDRESSING,
+								coder: 1,
+								line: 1,
+								coding: 0x10, // rcplib.CONNECT_PRIMITIVE_VIDEO_CODING.H264,
+							},
+						],
+					},
+				],
+			};
+			const res = await client.writeRCP(rcplib.CONF_CONNECT_PRIMITIVE, 1, data);
+
+			// open the websocket
+			const strSessionid = res.sessionid.toString(16).padStart(8, '0');
+			const strMediatype = "01"; //01: video, 02: audio
+			const strDirection = "01"; //01: receive, 00: transmit
+			const strLine = res.result.parsed.items[0].descriptors[0].line.toString(16).padStart(2, '0');
+			const strCoder = res.result.parsed.items[0].descriptors[0].coder.toString(16).padStart(2, '0'); //relative coder nbr
+
+			const url_video = `wss://${ip}/websocket/media_tunnel/${strSessionid}/${strMediatype}/${strDirection}/${strLine}/${strCoder}?index=1`;
+			const url_meta = `wss://${ip}/websocket/media_tunnel/${strSessionid}/${strMediatype}/${strDirection}/${strLine}/${strCoder}?index=2`;
+			openWebsocketVideo(url_video);
+			openWebsocketVCD(url_meta);
+			keepAliveSession();
+		}
+
+		const keepAliveSession = () => {
+			// keep alive time
+			// 0xffc20830
+			//client.writeRCP(rcplib.CONF_, 1, {});
+			if(client){
+				try {
+				client.readRCP(rcplib.CONF_RCP_CONNECTIONS_ALIVE);
+				console.log("Keep alive\n");
+				} catch (e) {
+					console.error("error sending keep alive: ", e);
+				}
+			}
+			setTimeout(keepAliveSession, 5000);
+		}
+
+		const openWebsocketVideo = (url) => {
+			try {
+				let socket = new WebSocket(url, 'rcpplus');
+				socket.binaryType = 'arraybuffer';
+				socket.addEventListener("open", (evt) => {
+					console.log('socket opened', evt);
+					// keep alive time
+					
+				});
+				socket.addEventListener("close", (evt) => {
+					console.log('socket closed', evt);
+				});
+				socket.addEventListener("error", (error) => {
+					console.log('socket error: ', error);
+				});
+				socket.addEventListener("message", async (msg) => {
+					//const a = new Uint8Array(await msg.data.arrayBuffer());
+					//console.log('socket msg: ', toHexString(a));
+					const frm_data = new Uint8Array(msg.data);
+					window.video_decoder.decodeFromTPKTS(frm_data);
+				});
+			} catch (e) {
+				console.error("error opening websocket: ", e)
+			}
+		}
+
+		const openWebsocketVCD = (url) => {
+			try {
+				let socket = new WebSocket(url, 'rcpplus');
+				socket.binaryType = 'arraybuffer';
+				socket.addEventListener("open", (evt) => {
+					console.log('socket opened', evt);
+					// keep alive time
+					
+				});
+				socket.addEventListener("close", (evt) => {
+					console.log('socket closed', evt);
+				});
+				socket.addEventListener("error", (error) => {
+					console.log('socket error: ', error);
+				});
+				socket.addEventListener("message", async (msg) => {
+					//const a = new Uint8Array(await msg.data.arrayBuffer());
+					//console.log('socket msg: ', toHexString(a));
+					const frm_data = new Uint8Array(msg.data);
+					window.video_decoder.decodeFromTPKTS(frm_data);
+					window.rule_engine.decodeFromTPKTS(frm_data);
+				});
+			} catch (e) {
+				console.error("error opening websocket: ", e)
+			}
+		}
+
+		const disconnect = async () => {
+			if (client) {
+				const res = await client.writeRCP(rcplib.CONF_DISCONNECT_PRIMITIVE_P_OCTET, 1, {});
+				console.log(res);
+				client.destroy();
+			}
+		}
+
+		const toHexString = (a) => {
+			return Array.from(a).map((b) => b.toString(16).padStart(2, "0")).join(" ")
+		}
+
+		window.connect = connect;
+		window.disconnect = disconnect;
+		
+	</script>
+	<script async type="text/javascript" src="./reid-native.js"></script>
+</body>
+
+</html>
