@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "sequence": [
+    [
+      "wait",
+      1000
+    ],
+    [
+      "SetCamera",
+      {
+        "bearing": 0.0,
+        "pitch": 0.0,
+        "zoom": 12.0,
+        "center": {
+          "lat": 48.137154,
+          "lon": 11.576124
+        }
+      }
+    ],
+    [
+      "wait",
+      1000
+    ],
+    [
+      "FlyTo",
+      {
+        "bearing": 20.0,
+        "pitch": 65.0,
+        "zoom": 20.0,
+        "center": {
+          "lat": 48.137154,
+          "lon": 11.576124
+        }
+      },
+      {
+        "duration": 2000000000
+      }
+    ],
+    [
+      "wait",
+      2300
+    ],
+    [
+      "EaseTo",
+      {
+        "bearing": 0.0,
+        "pitch": 0.0,
+        "zoom": 12.0,
+        "center": {
+          "lat": 48.137154,
+          "lon": 11.576124
+        }
+      },
+      {
+        "duration": 2000000000
+      }
+    ],
+    [
+      "wait",
+      1000
+    ]
+  ]
+}
